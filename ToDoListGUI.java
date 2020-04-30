@@ -18,7 +18,7 @@ public class ToDoListGUI extends Applet {
     int listnum_max = 100;
     int i;
     int windowsize_x = 1366, windowsize_y = 768;
-    int page = 0, nightmode = 0;
+    int page = 0, nightmode = 0, todo_add = 0;
     int class_number = 0;
     
     int setting_icon_x, setting_icon_y, setting_icon_length;
@@ -47,7 +47,7 @@ public class ToDoListGUI extends Applet {
         night_icon_length = 50;
         
         //画像読み込み
-        int img_homenumber = 8;
+        int img_homenumber = 9;
         img_home = new Image[img_homenumber];
         for (int i = 0; i < img_homenumber; i++) {
             img_home[i] = app.getImage(app.getCodeBase(), "images/Home" + i + ".png");
@@ -72,6 +72,11 @@ public class ToDoListGUI extends Applet {
                         else if(nightmode == 1) nightmode = 0;
                         repaint();
                     }
+                    if(windowsize_x - 170 <= e.getX() && e.getX() <= windowsize_x - 120 && 0 <= e.getY() && e.getY() <= 50){
+                        if(todo_add == 0) todo_add = 1;
+                        else todo_add = 0;
+                        repaint();
+                    }
                 }
                 else if(page == 1){
                     if(setting_icon_x <= e.getX() && e.getX() <= windowsize_x && setting_icon_y <= e.getY() && e.getY() <= setting_icon_y + setting_icon_length){
@@ -90,7 +95,6 @@ public class ToDoListGUI extends Applet {
     public void paint(Graphics g) {
         if(page == 0){
             g.drawImage(img_home[0], setting_icon_x, setting_icon_y, app);
-            g.drawImage(img_home[7], windowsize_x - 170, 0, app);
                 if(nightmode == 0){
                     g.drawImage(img_home[5], night_icon_x, night_icon_y, app);
                     app.setBackground(Color.white);
@@ -106,7 +110,12 @@ public class ToDoListGUI extends Applet {
                     g.setColor(Color.WHITE);  
                 }
                 g.drawString("ToDoList",15, 30);
-                g.drawString("(タスクを追加)", windowsize_x - 350, 38);
+                if(todo_add == 0){
+                    g.drawImage(img_home[7], windowsize_x - 170, 0, app);
+                    g.drawString("(タスクを追加)", windowsize_x - 350, 38);
+                } else{
+                    g.drawImage(img_home[8], windowsize_x - 170, 0, app);
+                }
                 for(i = 0; i < windowsize_y / 60; i++){
                     g.drawLine(0, night_icon_length + 10 + (i * 60), windowsize_x, night_icon_length + 10 + (i * 60));
                 }
@@ -131,7 +140,6 @@ public class ToDoListGUI extends Applet {
                 g.drawString("ToDoList - 設定",15, 30);
             }
             
-        }
-       
+        } 
     }
 }
