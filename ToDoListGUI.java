@@ -1,6 +1,8 @@
 import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 class todolist
 {
@@ -8,7 +10,7 @@ class todolist
     String data;
 }
 
-public class ToDoListGUI extends Applet implements ActionListener{
+public class ToDoListGUI extends Applet implements ActionListener, Runnable{
 
     Graphics g;
     Graphics2D g2;
@@ -16,11 +18,13 @@ public class ToDoListGUI extends Applet implements ActionListener{
     Image img_home[];
     Button ok;
     TextField tf1;
+    Thread th;
+    //int repetition = 0;
     
     int listnum_max = 100;
     int i;
     int windowsize_x = 1366, windowsize_y = 768;
-    int page = 0, nightmode = 0, todo_add = 0;
+    int page = 0, nightmode = 0, todo_add = 0, todo_complete = 0, complete_number = -1;
     int class_number = 0;
     todolist[] list = new todolist[listnum_max];
     
@@ -60,7 +64,7 @@ public class ToDoListGUI extends Applet implements ActionListener{
         night_icon_length = 50;
         
         //画像読み込み
-        int img_homenumber = 7;
+        int img_homenumber = 9;
         img_home = new Image[img_homenumber];
         for (int i = 0; i < img_homenumber; i++) {
             img_home[i] = app.getImage(app.getCodeBase(), "images/Home" + i + ".png");
@@ -85,6 +89,17 @@ public class ToDoListGUI extends Applet implements ActionListener{
                         else if(nightmode == 1) nightmode = 0;
                         repaint();
                     }
+                    for(i = 0; i < windowsize_y / 60; i++){
+                        if(i < class_number){
+                            if(25 <= e.getX() && e.getX() <= 25 + 50 && night_icon_length + 20 + (i * 60) <= e.getY() && e.getY() <= night_icon_length + 20 + (i * 60) + 50){
+                                todo_complete = 1;
+                                complete_number = i;
+                                repaint();
+                            } 
+                        } else{
+                        
+                        } 
+                    }
                 }
                 else if(page == 1){
                     if(setting_icon_x <= e.getX() && e.getX() <= windowsize_x && setting_icon_y <= e.getY() && e.getY() <= setting_icon_y + setting_icon_length){
@@ -99,6 +114,8 @@ public class ToDoListGUI extends Applet implements ActionListener{
                 }
             }        
         });
+        th = new Thread(this);
+        th.start();
     }
     public void paint(Graphics g) {
         if(page == 0){
@@ -118,9 +135,16 @@ public class ToDoListGUI extends Applet implements ActionListener{
                     g.setColor(Color.WHITE);  
                 }
                 g.drawString("ToDoList",15, 30);
+                g.drawLine(0, night_icon_length + 10, windowsize_x, night_icon_length + 10);
                 for(i = 0; i < windowsize_y / 60; i++){
-                    g.drawLine(0, night_icon_length + 10 + (i * 60), windowsize_x, night_icon_length + 10 + (i * 60));
+                    
                     if(i < class_number){
+                        g.drawLine(0, night_icon_length + 10 + ((i + 1) * 60), windowsize_x, night_icon_length + 10 + ((i + 1) * 60));
+                        if(complete_number == i){
+                            g.drawImage(img_home[8], 25, night_icon_length + 20 + (i * 60), app);
+                        }else{
+                            g.drawImage(img_home[7], 25, night_icon_length + 20 + (i * 60), app);
+                        }
                         g.drawString(list[i].data, 80, night_icon_length + 50 + (i * 60));
                     } else{
                         
@@ -156,5 +180,37 @@ public class ToDoListGUI extends Applet implements ActionListener{
         class_number +=1;
         tf1.setText("");
         repaint();
+    }
+    
+    @Override
+    public void run(){
+        while(true){
+            //this.repetition++;
+            //repaint();
+            if(todo_complete == 1){
+                try{
+                    todo_complete = 0;
+                    Thread.sleep(500);
+                    for(i = complete_number; i <= class_number; i++){
+                        list[i].view_number = list[i + 1].view_number;
+                        list[i].data = list[i + 1].data;
+                    }
+                    complete_number = -1;
+                    class_number -= 1;
+                    repaint();
+                } catch (InterruptedException ex) {
+                 Logger.getLogger(ToDoListGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }else{
+                
+            }
+            try {
+                //条件外の時、高速ループしないように
+                Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(ToDoListGUI.class.getName()).log(Level.SEVERE, null, ex);
+                }
+               
+        }
     }
 }
