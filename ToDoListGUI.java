@@ -1,3 +1,4 @@
+import java.io.*;
 import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.*;
@@ -6,7 +7,6 @@ import java.util.logging.Logger;
 
 class todolist
 {
-    int view_number;
     String data;
 }
 
@@ -42,7 +42,20 @@ public class ToDoListGUI extends Applet implements ActionListener, Runnable{
             list[i] = new todolist();
         }*/
         
-        //ファイル読み込み
+        try{
+            BufferedReader br = new BufferedReader(new FileReader("todolist.txt"));
+            String str1;
+            int count = 0;
+            while((str1 = br.readLine()) != null){
+                list[count].data = str1;
+                count++;
+            }
+            br.close();
+            class_number = count;
+        }
+        catch(IOException e){
+            System.out.println("記録がありません");
+        }
         
         app = this;
         app.setSize(windowsize_x, windowsize_y);
@@ -120,37 +133,47 @@ public class ToDoListGUI extends Applet implements ActionListener, Runnable{
     public void paint(Graphics g) {
         if(page == 0){
             g.drawImage(img_home[0], setting_icon_x, setting_icon_y, app);
-                if(nightmode == 0){
-                    g.drawImage(img_home[5], night_icon_x, night_icon_y, app);
-                    app.setBackground(Color.white);
-                    Font f = new Font("Serif", Font.BOLD, 25);
-                    g.setFont(f);
-                    g.setColor(Color.BLACK);
-                }
-                else if(nightmode == 1){
-                    g.drawImage(img_home[6], night_icon_x, night_icon_y, app);
-                    app.setBackground(new Color(50, 50, 50));
-                    Font f = new Font("Serif", Font.BOLD, 25);
-                    g.setFont(f);
-                    g.setColor(Color.WHITE);  
-                }
-                g.drawString("ToDoList",15, 30);
-                g.drawLine(0, night_icon_length + 10, windowsize_x, night_icon_length + 10);
-                for(i = 0; i < windowsize_y / 60; i++){
+            if(nightmode == 0){
+                g.drawImage(img_home[5], night_icon_x, night_icon_y, app);
+                 app.setBackground(Color.white);
+                 Font f = new Font("Serif", Font.BOLD, 25);
+                g.setFont(f);
+                g.setColor(Color.BLACK);
+            }
+            else if(nightmode == 1){
+                g.drawImage(img_home[6], night_icon_x, night_icon_y, app);
+                app.setBackground(new Color(50, 50, 50));
+                Font f = new Font("Serif", Font.BOLD, 25);
+                g.setFont(f);
+                g.setColor(Color.WHITE);  
+            }
+            g.drawString("ToDoList",15, 30);
+            g.drawLine(0, night_icon_length + 10, windowsize_x, night_icon_length + 10);
+            for(i = 0; i < windowsize_y / 60; i++){
                     
-                    if(i < class_number){
-                        g.drawLine(0, night_icon_length + 10 + ((i + 1) * 60), windowsize_x, night_icon_length + 10 + ((i + 1) * 60));
-                        if(complete_number == i){
-                            g.drawImage(img_home[8], 25, night_icon_length + 20 + (i * 60), app);
-                        }else{
-                            g.drawImage(img_home[7], 25, night_icon_length + 20 + (i * 60), app);
-                        }
-                        g.drawString(list[i].data, 80, night_icon_length + 50 + (i * 60));
-                    } else{
+                if(i < class_number){
+                    g.drawLine(0, night_icon_length + 10 + ((i + 1) * 60), windowsize_x, night_icon_length + 10 + ((i + 1) * 60));
+                    if(complete_number == i){
+                        g.drawImage(img_home[8], 25, night_icon_length + 20 + (i * 60), app);
+                    }else{
+                        g.drawImage(img_home[7], 25, night_icon_length + 20 + (i * 60), app);
+                    }
+                    g.drawString(list[i].data, 80, night_icon_length + 50 + (i * 60));
+                } else{
                         
-                    } 
-                }
-                
+                } 
+            }
+        try{
+            PrintWriter pw = new PrintWriter (new BufferedWriter(new FileWriter("todolist.txt")));
+            for(i = 0; i < class_number; i++){
+                 pw.println(list[i].data); 
+            }
+            pw.close();
+        }
+        catch(IOException e){
+            System.out.println("入出力エラー");
+            }
+              
         }
         else if (page == 1){
             g.drawImage(img_home[4], setting_icon_x, setting_icon_y, app);
@@ -175,7 +198,6 @@ public class ToDoListGUI extends Applet implements ActionListener, Runnable{
     }
     public void actionPerformed(ActionEvent e){
         String str = tf1.getText();
-        list[class_number].view_number = class_number;
         list[class_number].data = str;
         class_number +=1;
         tf1.setText("");
@@ -192,7 +214,6 @@ public class ToDoListGUI extends Applet implements ActionListener, Runnable{
                     todo_complete = 0;
                     Thread.sleep(500);
                     for(i = complete_number; i <= class_number; i++){
-                        list[i].view_number = list[i + 1].view_number;
                         list[i].data = list[i + 1].data;
                     }
                     complete_number = -1;
