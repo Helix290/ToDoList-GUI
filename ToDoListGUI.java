@@ -19,7 +19,6 @@ public class ToDoListGUI extends Applet implements ActionListener, Runnable{
     Button ok;
     TextField tf1;
     Thread th;
-    //int repetition = 0;
     
     int listnum_max = 100;
     int i;
@@ -60,7 +59,6 @@ public class ToDoListGUI extends Applet implements ActionListener, Runnable{
         g2 = (Graphics2D) g;
         ok = new Button("OK");
         tf1 = new TextField(30);
-        //setLayout(new GridLayout(3,1,10,10));
         add(tf1);
         add(ok);
         tf1.addActionListener(this);
@@ -111,7 +109,7 @@ public class ToDoListGUI extends Applet implements ActionListener, Runnable{
                             } 
                             if(windowsize_x - 160 <= e.getX() && e.getX() <= windowsize_x - 160 + 50 && night_icon_length + 20 + (i * 60) <= e.getY() && e.getY() <= night_icon_length + 20 + (i * 60) + 50){
                                 //タスクを上のと交換する処理　一番上の場合は何もしない
-                                if(i == 1){
+                                if(i == 0){
                                 } else {
                                     String tmp;
                                     tmp = list[i].data;
@@ -122,7 +120,7 @@ public class ToDoListGUI extends Applet implements ActionListener, Runnable{
                             }
                             if(windowsize_x - 100 <= e.getX() && e.getX() <= windowsize_x - 100 + 50 && night_icon_length + 20 + (i * 60) <= e.getY() && e.getY() <= night_icon_length + 20 + (i * 60) + 50){
                                 //同様に、一番下の場合は何もしない
-                                if((windowsize_y / 60) - 1 == i){
+                                if((windowsize_y / 60) - 1 == i || class_number - 1 == i){
                                     
                                 }else{
                                     String tmp;
@@ -171,7 +169,7 @@ public class ToDoListGUI extends Applet implements ActionListener, Runnable{
                 g.setFont(f);
                 g.setColor(Color.WHITE);  
             }
-            g.drawString("ToDoList",15, 30);
+            g.drawString("ToDoList", 15, 30);
             g.drawLine(0, night_icon_length + 10, windowsize_x, night_icon_length + 10);
             for(i = 0; i < windowsize_y / 60; i++){
                     
@@ -197,9 +195,8 @@ public class ToDoListGUI extends Applet implements ActionListener, Runnable{
             pw.close();
         }
         catch(IOException e){
-            System.out.println("入出力エラー");
-            }
-              
+            System.out.println("出力エラー");
+            }  
         }
         else if (page == 1){
             g.drawImage(img_home[4], setting_icon_x, setting_icon_y, app);
@@ -209,7 +206,6 @@ public class ToDoListGUI extends Applet implements ActionListener, Runnable{
                 Font f = new Font("Serif", Font.BOLD, 25);
                 g.setFont(f);
                 g.setColor(Color.BLACK);
-                g.drawString("ToDoList - 設定",15, 30);
             }
             else if(nightmode == 1){
                 g.drawImage(img_home[6], night_icon_x, night_icon_y, app);
@@ -217,9 +213,10 @@ public class ToDoListGUI extends Applet implements ActionListener, Runnable{
                 Font f = new Font("Serif", Font.BOLD, 25);
                 g.setFont(f);
                 g.setColor(Color.WHITE);
-                g.drawString("ToDoList - 設定",15, 30);
             }
-            
+            g.drawString("ToDoList - 設定", 15, 30);
+            g.drawLine(0, night_icon_length + 10, windowsize_x, night_icon_length + 10);
+            g.drawString("解像度：" + windowsize_x + " × " + windowsize_y, 15, 100);
         } 
     }
     public void actionPerformed(ActionEvent e){
@@ -233,8 +230,6 @@ public class ToDoListGUI extends Applet implements ActionListener, Runnable{
     @Override
     public void run(){
         while(true){
-            //this.repetition++;
-            //repaint();
             if(todo_complete == 1){
                 try{
                     todo_complete = 0;
@@ -254,10 +249,9 @@ public class ToDoListGUI extends Applet implements ActionListener, Runnable{
             try {
                 //条件外の時、高速ループしないように
                 Thread.sleep(500);
-                } catch (InterruptedException ex) {
+            } catch (InterruptedException ex) {
                     Logger.getLogger(ToDoListGUI.class.getName()).log(Level.SEVERE, null, ex);
-                }
-               
+            }        
         }
     }
 }
